@@ -15,6 +15,7 @@ public class Main {
     public static void main(String[] args) {
         DoctorView dv = new DoctorView();
         DoctorController dc = new DoctorController();
+        dv.loadFile("input.txt");
         dc.menu(dv);
     }
 }

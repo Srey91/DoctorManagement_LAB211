@@ -4,6 +4,11 @@
  */
 package view;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import model.Doctor;
 import model.DoctorManagement;
 import validation.Validation;
@@ -15,6 +20,66 @@ import validation.Validation;
 public class DoctorView {
     DoctorManagement dm = new DoctorManagement();
     Validation v = new Validation();
+    
+    public void loadFile(String path)
+    {
+        File file = new File(path);
+        FileReader fileReader = null;
+        BufferedReader bufferedReader;
+        boolean isDuplicatedId = false;
+        
+        if (file.exists() && file.isFile())
+        {
+            try
+            {
+                fileReader = new FileReader(file);
+                bufferedReader = new BufferedReader(fileReader);
+                
+                String line = bufferedReader.readLine();
+                
+                while (line != null)
+                {
+                    if (line.trim().length() != 0)
+                    {
+                        String[] data = line.split(",");
+
+                        String code = data[0];
+                        for (Doctor doctor : dm.getDoctorList())
+                        {
+                            if (doctor.getCode().equals(code))
+                            {
+                                isDuplicatedId = true;
+                            }
+                        }
+                        String name = data[1];
+                        String specialization = data[2];
+                        int availability = Integer.parseInt(data[3]);
+
+                        Doctor doctor = new Doctor(code, name, specialization, availability);
+                        dm.getDoctorList().add(doctor);
+                        
+                        if (isDuplicatedId) throw new IOException("Id is duplicate!!!");
+                    }
+                    line = bufferedReader.readLine();    
+                }
+                System.out.println("Load file success!!!");
+                    
+            }catch (FileNotFoundException e)
+            {
+                System.out.println("File not found!!!");
+            }catch (IOException e)
+            {
+                System.err.println("File close error!!!");
+            }finally
+            {
+                try {
+                    fileReader.close();
+                } catch (IOException ex) {
+                    System.out.println("File close error!!!");
+                }
+            }
+        }
+    }
     
     public void add()
     {
